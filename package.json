@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "start": "http-server -p 8091",
+    "demo": "concurrently -k --names static,ws \"npm run start\" \"npm run ws:auto\"",
+    "ws:auto": "node ./ws/serve-on-connect.js"
+  },
+  "dependencies": {
+    "concurrently": "^3.5.0",
+    "http-server": "^0.10.0",
+    "prompt": "^1.0.0",
+    "ws": "^3.2.0"
+  }
+}

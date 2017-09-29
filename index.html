@@ -1,0 +1,204 @@
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>💻👾</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.2/css/bulma.min.css"></link>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"></link>
+  <style>
+    .status__name {
+      text-transform: capitalize;
+    }
+
+    .options {
+      margin-bottom: 0.5em;
+    }
+
+    .response {
+      font-family: "Lucida Console", Monaco, monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" class="section">
+    <div class="container">
+      <div class="is-clearfix">
+        <div class="options is-pulled-right">
+          <div class="tags has-addons" v-on:click="openSettings">
+            <span class="tag" v-bind:class="connectionClass"> {{ connStatus }}</span>
+            <a class="button is-small is-light tag">
+                <i class="fa fa-cog" aria-hidden="true"></i>
+              </a>
+          </div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="status  has-text-centered">
+          <p class="heading">
+            Status
+          </p>
+          <p class="title status__name">
+            {{ status.name }}
+          </p>
+          <p class="subtitle" v-show="status && status.probability">
+            (Prob. {{ status.probability }})
+          </p>
+          <div class="response has-text-grey-light"><small>{{ lastMessage }}</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" v-bind:class="{ 'is-active': settings.isOpen }">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <div class="modal-card-head">
+          <p class="modal-card-title">Settings</p>
+          <button class="delete" v-on:click="closeSettings" aria-label="close"></button>
+        </div>
+        <div class="modal-card-body">
+          <div class="field">
+            <label class="label">Host</label>
+            <div class="control">
+              <input v-model="settings.newHost" class="input" type="text" placeholder="Host">
+            </div>
+          </div>
+        </div>
+        <div class="modal-card-foot">
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="button is-primary" v-on:click="saveSettings">Save and connect</button>
+            </div>
+            <div class="control">
+              <button class="button is-link" v-on:click="closeSettings">
+                  Cancel
+                </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <script src="https://unpkg.com/vue@2.4.4/dist/vue.min.js"></script>
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        ws: null,
+        host: 'localhost:8090',
+        connStatus: 'offline',
+        lastMessage: null,
+        settings: {
+          isOpen: true,
+          newHost: null,
+        }
+      },
+      mounted() {
+        this.settings.newHost = this.host;
+      },
+      computed: {
+        status() {
+          if (this.lastMessage) {
+            try {
+              const data = JSON.parse(this.lastMessage);
+              return Object.keys(data).reduce((mostProbable, action) => {
+                if (data[action] > mostProbable.probability) {
+                  mostProbable = {
+                    name: action,
+                    probability: data[action]
+                  };
+                }
+                return mostProbable;
+              }, {
+                name: null,
+                probability: Number.NEGATIVE_INFINITY
+              });
+            } catch (e) {}
+          }
+          return {
+            name: 'unknown 🤔'
+          };
+        },
+        connectionClass() {
+          return {
+            'is-success': this.connStatus === 'online',
+            'is-warning': this.connStatus === 'connecting',
+            'is-danger': this.connStatus === 'offline',
+          };
+        }
+      },
+      methods: {
+        openSettings() {
+          this.settings.newHost = this.host;
+          this.settings.isOpen = true;
+        },
+        closeSettings() {
+          this.settings.isOpen = false;
+        },
+        saveSettings() {
+          this.settings.isOpen = false;
+          const newHost = this.settings.newHost;
+          this.host = newHost.startsWith('ws://') ? newHost : `ws://${newHost}`;
+          this.connect();
+        },
+        onMessage(event) {
+          console.groupCollapsed('wsReceivedMessage');
+          console.log(event.data);
+          console.groupEnd();
+          let msg;
+          try {
+            msg = JSON.parse(event.data);
+            this.lastMessage = event.data;
+          } catch (error) {
+            console.error('Ignoring malformed json');
+          }
+        },
+        onConnectionOpen() {
+          console.log('Connection open');
+          this.connStatus = 'online';
+        },
+        onConnectionClose() {
+          console.log('Connection closed');
+          this.connStatus = 'offline';
+        },
+        connect() {
+          console.log(`Connecting to "${this.host}"...`);
+          if (this.ws) {
+            // clean old connection
+            this.ws.cleanListeners();
+            this.ws.close();
+          }
+
+          this.connStatus = 'connecting';
+          try {
+            this.ws = new WebSocket(this.host);
+          } catch (e) {
+            this.connStatus = 'offline';
+            console.error(e);
+            return;
+          }
+
+          let messageHandler = this.onMessage.bind(this);
+          this.ws.addEventListener('message', messageHandler);
+
+          let openHandler = this.onConnectionOpen.bind(this);
+          this.ws.addEventListener('open', openHandler);
+
+          let closeHandler = this.onConnectionClose.bind(this);
+          this.ws.addEventListener('close', closeHandler);
+
+          this.ws.cleanListeners = function () {
+            this.removeEventListener('message', messageHandler);
+            this.removeEventListener('open', openHandler);
+            this.removeEventListener('close', closeHandler);
+          };
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
