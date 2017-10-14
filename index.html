@@ -5,19 +5,7 @@
   <title>💻👾</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.2/css/bulma.min.css"></link>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"></link>
-  <style>
-    .status__name {
-      text-transform: capitalize;
-    }
-
-    .options {
-      margin-bottom: 0.5em;
-    }
-
-    .response {
-      font-family: "Lucida Console", Monaco, monospace;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css"></link>
 </head>
 
 <body>
@@ -47,6 +35,19 @@
           <div class="response has-text-grey-light"><small>{{ lastMessage }}</small></div>
         </div>
       </div>
+    </div>
+
+    <div class="scene" v-bind:class="{ 'scene--standing': !isWalking, 'scene--walking': isWalking }">
+    <!-- <div class="scene"> -->
+      <div class="power-bars">
+        <div class="power-bar" v-bind:class="{ 'power-bar--yellow': status.name !== 'walking' }">
+          <div class="power-bar__progress" v-bind:style="{ width: probToPercentage(lastMessage && lastMessage.walking) }"></div>
+        </div>
+        <div class="power-bar power-bar--animate-low" v-bind:class="{ 'power-bar--yellow': status.name !== 'standing' }">
+          <div class="power-bar__progress" v-bind:style="{ width: probToPercentage(lastMessage && lastMessage.standing) }"></div>
+        </div>
+      </div>
+      <div id="character" class="character"></div>
     </div>
 
     <div class="modal" v-bind:class="{ 'is-active': settings.isOpen }">
@@ -81,124 +82,10 @@
 
   </div>
 
-
   <script src="https://unpkg.com/vue@2.4.4/dist/vue.min.js"></script>
-  <script>
-    const app = new Vue({
-      el: '#app',
-      data: {
-        ws: null,
-        host: 'localhost:8090',
-        connStatus: 'offline',
-        lastMessage: null,
-        settings: {
-          isOpen: true,
-          newHost: null,
-        }
-      },
-      mounted() {
-        this.settings.newHost = this.host;
-      },
-      computed: {
-        status() {
-          if (this.lastMessage) {
-            try {
-              const data = JSON.parse(this.lastMessage);
-              return Object.keys(data).reduce((mostProbable, action) => {
-                if (data[action] > mostProbable.probability) {
-                  mostProbable = {
-                    name: action,
-                    probability: data[action]
-                  };
-                }
-                return mostProbable;
-              }, {
-                name: null,
-                probability: Number.NEGATIVE_INFINITY
-              });
-            } catch (e) {}
-          }
-          return {
-            name: 'unknown 🤔'
-          };
-        },
-        connectionClass() {
-          return {
-            'is-success': this.connStatus === 'online',
-            'is-warning': this.connStatus === 'connecting',
-            'is-danger': this.connStatus === 'offline',
-          };
-        }
-      },
-      methods: {
-        openSettings() {
-          this.settings.newHost = this.host;
-          this.settings.isOpen = true;
-        },
-        closeSettings() {
-          this.settings.isOpen = false;
-        },
-        saveSettings() {
-          this.settings.isOpen = false;
-          const newHost = this.settings.newHost;
-          this.host = newHost.startsWith('ws://') ? newHost : `ws://${newHost}`;
-          this.connect();
-        },
-        onMessage(event) {
-          console.groupCollapsed('wsReceivedMessage');
-          console.log(event.data);
-          console.groupEnd();
-          let msg;
-          try {
-            msg = JSON.parse(event.data);
-            this.lastMessage = event.data;
-          } catch (error) {
-            console.error('Ignoring malformed json');
-          }
-        },
-        onConnectionOpen() {
-          console.log('Connection open');
-          this.connStatus = 'online';
-        },
-        onConnectionClose() {
-          console.log('Connection closed');
-          this.connStatus = 'offline';
-        },
-        connect() {
-          console.log(`Connecting to "${this.host}"...`);
-          if (this.ws) {
-            // clean old connection
-            this.ws.cleanListeners();
-            this.ws.close();
-          }
+  <script src="character-animation.js"></script>
+  <script src="app.js"></script>
 
-          this.connStatus = 'connecting';
-          try {
-            this.ws = new WebSocket(this.host);
-          } catch (e) {
-            this.connStatus = 'offline';
-            console.error(e);
-            return;
-          }
-
-          let messageHandler = this.onMessage.bind(this);
-          this.ws.addEventListener('message', messageHandler);
-
-          let openHandler = this.onConnectionOpen.bind(this);
-          this.ws.addEventListener('open', openHandler);
-
-          let closeHandler = this.onConnectionClose.bind(this);
-          this.ws.addEventListener('close', closeHandler);
-
-          this.ws.cleanListeners = function () {
-            this.removeEventListener('message', messageHandler);
-            this.removeEventListener('open', openHandler);
-            this.removeEventListener('close', closeHandler);
-          };
-        }
-      }
-    });
-  </script>
 </body>
 
 </html>

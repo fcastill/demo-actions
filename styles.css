@@ -1,0 +1,116 @@
+.status__name {
+  text-transform: capitalize;
+}
+
+.options {
+  margin-bottom: 0.5em;
+}
+
+.response {
+  font-family: "Lucida Console", Monaco, monospace;
+}
+
+.scene {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding: 56.25% 0 0 0;
+  background-image: url('animation_bg.svg');
+  background-size: contain;
+  animation: bg-move 0 infinite linear;
+  animation-fill-mode: both;
+}
+
+.scene--standing {
+  animation-duration: 400s;
+}
+
+.scene--walking {
+  animation-duration: 30s;
+}
+
+@keyframes bg-move {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -98vw 0;
+  }
+}
+
+.character {
+  height: 40%;
+  width: 167.45vh;
+  margin: 0 0;
+  background-image: url('animation-sprite-3.svg');
+  background-position: 80% 0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: absolute;
+  bottom: 20%;
+  left: 25%;
+}
+
+.power-bars {
+  position: absolute;
+  top: 4vh;
+  left: 4vh;
+  height: 35%;
+  width: 25%;
+}
+
+.power-bar+.power-bar {
+  margin-top: 4vh;
+}
+
+.power-bar {
+  background-color: #1e2530;
+  border: 1vh solid #101821;
+  width: 100%;
+  height: 4vh;
+  box-shadow: 0px -1vh 0px 0px #2d3d4d, 0px 1vh 0px 0px #2d3d4d, 1vh 0px 0px 0px #2d3d4d, -1vh 0px 0px 0px #2d3d4d;
+}
+
+.power-bar__progress {
+  width: 10%;
+  height: 100%;
+  background: #82f734;
+  background: linear-gradient(to bottom, #2afe2f 0%, #2afe2f 30%, #1cbc21 30%, #1cbc21 100%);
+  transition: all 0.1s steps(2, end);
+}
+
+.power-bar--yellow .power-bar__progress {
+  background: linear-gradient(to bottom, #f5c946 0%, #f5c946 30%, #f4a327 30%, #f4a327 100%);
+}
+
+.power-bar--animate .power-bar__progress {
+  animation: animFill 1.8s steps(4) alternate infinite;
+}
+
+.power-bar--animate-yellow .power-bar__progress {
+  animation: animLow 1.8s steps(3) alternate infinite;
+}
+
+@keyframes animFill {
+  0% {
+    width: 60%;
+  }
+  50% {
+    width: 80%;
+  }
+  100% {
+    width: 90%;
+  }
+}
+
+@keyframes animLow {
+  0% {
+    width: 20%;
+  }
+  60% {
+    width: 45%;
+  }
+  100% {
+    width: 30%;
+  }
+}
