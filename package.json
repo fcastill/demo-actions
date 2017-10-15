@@ -2,12 +2,17 @@
   "scripts": {
     "start": "http-server -p 8091",
     "demo": "concurrently -k --names static,ws \"npm run start\" \"npm run ws:auto\"",
-    "ws:auto": "node ./ws/serve-on-connect.js"
+    "ws:auto": "node ./ws/serve-on-connect.js",
+    "copyvendor": "copyfiles -f ./node_modules/bulma/css/bulma.css ./node_modules/vue/dist/vue.min.js ./node_modules/@tweenjs/tween.js/src/Tween.js vendor"
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^17.1.1",
+    "bulma": "^0.6.0",
     "concurrently": "^3.5.0",
+    "copyfiles": "^1.2.0",
     "http-server": "^0.10.0",
     "prompt": "^1.0.0",
+    "vue": "^2.5.2",
     "ws": "^3.2.0"
   }
 }

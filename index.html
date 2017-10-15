@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>💻👾</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.2/css/bulma.min.css"></link>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"></link>
+  <link rel="stylesheet" href="vendor/bulma.css"></link>
   <link rel="stylesheet" href="styles.css"></link>
 </head>
 
@@ -12,9 +11,7 @@
   <div id="app">
     <div class="config-btn tags has-addons" v-on:click="openSettings">
         <span class="tag" v-bind:class="connectionClass"> {{ connStatus }}</span>
-        <a class="button is-small is-light tag">
-            <i class="fa fa-cog" aria-hidden="true"></i>
-          </a>
+        <a class="button is-small is-light tag">⚙</a>
     </div>
 
     <div id="scene" class="scene">
@@ -67,8 +64,8 @@
 
   </div>
 
-  <script src="https://unpkg.com/vue@2.4.4/dist/vue.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.3.5/Tween.min.js"></script>
+  <script src="vendor/vue.min.js"></script>
+  <script src="vendor/Tween.js"></script>
   <script src="character-animation.js"></script>
   <script src="app.js"></script>
 
