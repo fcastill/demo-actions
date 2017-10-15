@@ -18,7 +18,6 @@ const app = new Vue({
     characterEl = document.getElementById('character');
     sceneEl = document.getElementById('scene');
     this.animation = CharacterAnimation.create(scene, character);
-    this.animation.start();
 
     // maintain aspect ratio for character
     const onResize = () => {

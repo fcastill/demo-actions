@@ -9,38 +9,24 @@
 </head>
 
 <body>
-  <div id="app" class="section">
-    <div class="container">
-      <div class="is-clearfix">
-        <div class="options is-pulled-right">
-          <div class="tags has-addons" v-on:click="openSettings">
-            <span class="tag" v-bind:class="connectionClass"> {{ connStatus }}</span>
-            <a class="button is-small is-light tag">
-                <i class="fa fa-cog" aria-hidden="true"></i>
-              </a>
-          </div>
-        </div>
-      </div>
-      <div class="box">
-        <div class="status  has-text-centered">
-          <p class="heading">
-            Status
-          </p>
-          <p class="title status__name">
-            {{ status.name }}
-          </p>
-          <p class="subtitle" v-show="status && status.probability">
-            (Prob. {{ status.probability }})
-          </p>
-          <div class="response has-text-grey-light"><small>{{ lastMessage }}</small></div>
-        </div>
-      </div>
+  <div id="app">
+    <div class="config-btn tags has-addons" v-on:click="openSettings">
+        <span class="tag" v-bind:class="connectionClass"> {{ connStatus }}</span>
+        <a class="button is-small is-light tag">
+            <i class="fa fa-cog" aria-hidden="true"></i>
+          </a>
     </div>
 
     <div id="scene" class="scene">
       <div class="power-bars">
+        <div class="power-bars__text">
+          Walking  ({{ probToPercentage(lastMessage && lastMessage.walking) }})
+        </div>
         <div class="power-bar" v-bind:class="{ 'power-bar--yellow': status.name !== 'walking' }">
           <div class="power-bar__progress" v-bind:style="{ width: probToPercentage(lastMessage && lastMessage.walking) }"></div>
+        </div>
+        <div class="power-bars__text">
+          Standing ({{ probToPercentage(lastMessage && lastMessage.standing) }})
         </div>
         <div class="power-bar power-bar--animate-low" v-bind:class="{ 'power-bar--yellow': status.name !== 'standing' }">
           <div class="power-bar__progress" v-bind:style="{ width: probToPercentage(lastMessage && lastMessage.standing) }"></div>
