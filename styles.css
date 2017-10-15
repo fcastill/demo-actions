@@ -17,17 +17,17 @@
   padding: 56.25% 0 0 0;
   background-image: url('animation_bg.svg');
   background-size: contain;
-  animation: bg-move 0 infinite linear;
-  animation-fill-mode: both;
+  /* animation: bg-move 0 infinite linear;
+  animation-fill-mode: both; */
 }
 
-.scene--standing {
+/* .scene--standing {
   animation-duration: 400s;
 }
 
 .scene--walking {
   animation-duration: 30s;
-}
+} */
 
 @keyframes bg-move {
   from {

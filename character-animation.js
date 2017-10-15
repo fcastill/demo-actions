@@ -1,11 +1,14 @@
 class CharacterAnimation {
   
-  static create(element) {
-    return new CharacterAnimation(element);
+  static create(scene, character) {
+    return new CharacterAnimation(scene, character);
   }
   
-  constructor(element) {
-    this.element = element;
+  constructor(scene, character) {
+    this.character = character;
+    this.scene = scene;
+    this.sceneState = { x: 0 };
+
     this.frames = [];
     this.frameRate = 250;
     
@@ -22,11 +25,15 @@ class CharacterAnimation {
       }
     };
 
-    this._setupState(this.statesConfig.walking);
+    this._setupSceneTweening();
+    this._setupState(this.statesConfig.standing);
   }
   
   start() {
     window.requestAnimationFrame(() => this._step());
+    if (this.sceneTween) {
+      this.sceneTween.start();
+    }
   }
   
   stop(){
@@ -34,17 +41,23 @@ class CharacterAnimation {
       clearTimeout(this.nextAnimationFrame);
       this.nextAnimationFrame = null;
     }
+    if (this.sceneTween) {
+      this.sceneTween.stop();
+    }
   }
 
   walk() {
     this.stop();
     this._setupState(this.statesConfig.walking);
+    this.sceneTween = this._makeTween(90000);
     this.start();
   }
 
   stand() {
+    // this.sceneTween.stop();
     this.stop();
     this._setupState(this.statesConfig.standing);
+    this.sceneTween = this._makeTween(1000000);
     this.start();
   }
   
@@ -53,7 +66,7 @@ class CharacterAnimation {
     const nextState = this.frames.shift();
     // walk.classList.add(nextState);
     this.frames.push(nextState);
-    this.element.style.backgroundPosition = `${nextState} 0`;
+    this.character.style.backgroundPosition = `${nextState} 0`;
     this.nextAnimationFrame = setTimeout(() => {
       window.requestAnimationFrame(() => this._step());
     }, this.frameRate);
@@ -62,6 +75,25 @@ class CharacterAnimation {
   _setupState(config) {
     this.frames = [...config.frames];
     this.frameRate = config.frameRate;
+  }
+
+  _setupSceneTweening() {
+    const animate = () => {
+      requestAnimationFrame(animate);
+      TWEEN.update();
+    }
+    animate();
+  }
+
+  _makeTween(duration) {
+    const self = this;
+    return new TWEEN.Tween(this.sceneState) // Create a new tween that modifies 'coords'.
+      .to({ x: self.scene.offsetWidth }, duration)
+      .repeat(Infinity)
+      // .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
+      .onUpdate(() => { // Called after tween.js updates 'coords'.
+          self.scene.style.backgroundPosition = `-${self.sceneState.x}vw 0`;
+      });
   }
 
 }

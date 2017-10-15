@@ -37,8 +37,7 @@
       </div>
     </div>
 
-    <div class="scene" v-bind:class="{ 'scene--standing': !isWalking, 'scene--walking': isWalking }">
-    <!-- <div class="scene"> -->
+    <div id="scene" class="scene">
       <div class="power-bars">
         <div class="power-bar" v-bind:class="{ 'power-bar--yellow': status.name !== 'walking' }">
           <div class="power-bar__progress" v-bind:style="{ width: probToPercentage(lastMessage && lastMessage.walking) }"></div>
@@ -83,6 +82,7 @@
   </div>
 
   <script src="https://unpkg.com/vue@2.4.4/dist/vue.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.3.5/Tween.min.js"></script>
   <script src="character-animation.js"></script>
   <script src="app.js"></script>
 

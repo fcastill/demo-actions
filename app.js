@@ -10,13 +10,15 @@ const app = new Vue({
       isOpen: true,
       newHost: null,
     },
-    character: null,
+    animation: null,
   },
   mounted() {
     this.settings.newHost = this.host;
 
     characterEl = document.getElementById('character');
-    this.character = CharacterAnimation.create(character);
+    sceneEl = document.getElementById('scene');
+    this.animation = CharacterAnimation.create(scene, character);
+    this.animation.start();
 
     // maintain aspect ratio for character
     const onResize = () => {
@@ -64,9 +66,9 @@ const app = new Vue({
         return;
       }
       if (status.name === 'walking') {
-        this.character.walk();
+        this.animation.walk();
       } else {
-        this.character.stand();
+        this.animation.stand();
       }
     }
   },
