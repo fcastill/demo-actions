@@ -102,7 +102,8 @@ const app = new Vue({
       if (probability > 0) {
         prob = probability < 1 ? probability : 1;
       }
-      return `${prob*100}%`; 
+      let percentage = prob * 100;
+      return `${percentage.toFixed(2)}%`; 
     },
     onConnectionOpen() {
       console.log('Connection open');

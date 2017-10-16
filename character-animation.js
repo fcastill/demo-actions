@@ -5,6 +5,8 @@ class CharacterAnimation {
   }
   
   constructor(scene, character) {
+    this.totalFrames = 6;
+
     this.character = character;
     this.scene = scene;
     this.sceneState = { x: 0 };
@@ -17,11 +19,11 @@ class CharacterAnimation {
     this.statesConfig = {
       walking: {
         frameRate: 210,
-        frames: ['0%', '20%', '40%', '60%']
+        frames: [0, 1, 2, 3]
       },
       standing: {
         frameRate: 400,
-        frames: ['80%', '100%']
+        frames: [4, 5]
       }
     };
 
@@ -60,13 +62,13 @@ class CharacterAnimation {
     this.sceneTween = this._makeTween(1000000);
     this.start();
   }
-  
+
   _step() {
-    // walk.classList.remove(...frames);
-    const nextState = this.frames.shift();
-    // walk.classList.add(nextState);
-    this.frames.push(nextState);
-    this.character.style.backgroundPosition = `${nextState} 0`;
+    const nextFrameIndex = this.frames.shift();
+    this.frames.push(nextFrameIndex);
+    const framePosition = 100 / (this.totalFrames - 1) * nextFrameIndex;
+    // const framePosition = this.character.offsetWidth * nextFrameIndex;
+    this.character.style.backgroundPosition = `${framePosition}% 0`;
     this.nextAnimationFrame = setTimeout(() => {
       window.requestAnimationFrame(() => this._step());
     }, this.frameRate);
